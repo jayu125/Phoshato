@@ -1,15 +1,20 @@
-import { auth } from "../firebase";
+import styled from "styled-components";
+import PostingForm from "../components/posting-form";
+import Timeline from "../components/timeline";
+const Wrapper = styled.div`
+  display: grid;
+  gap: 50px;
+  overflow-y: scroll;
+  grid-template-rows: 1fr 5fr;
+`;
 
 export default function Home() {
-  const logOut = () => {
-    auth.signOut();
-  };
   return (
     <>
-      <h1>
-        HOME
-        <button onClick={logOut}>Log out</button>
-      </h1>
+      <Wrapper>
+        <PostingForm />
+        <Timeline />
+      </Wrapper>
     </>
   );
 }

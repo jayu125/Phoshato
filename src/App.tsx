@@ -11,16 +11,24 @@ import LoadingScreen from "./components/loading-screen";
 import { auth } from "./firebase";
 import ProtectedRoute from "./components/protected-route";
 import ResetPassword from "./routes/reset-password";
+import Search from "./routes/search";
 
 const GlobalStyle = createGlobalStyle`
+
+  --main-font-family: Pretendard-regular;
   ${reset}
+  &::-webkit-scrollbar {
+  display: none;
+  }
   * {
     box-sizing: border-box;
-    font-family:Pretendard-regular
+    font-family: --main-font-family, system-ui, -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+      "Open Sans", "Helvetica Neue", sans-serif;
   }
   body{
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
     font-family:Pretendard-regular, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }
   @font-face {
@@ -47,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <Profile />,
+      },
+      {
+        path: "search",
+        element: <Search />,
       },
     ],
   },

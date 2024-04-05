@@ -7,14 +7,15 @@ import { Error, Form, Switcher } from "../components/auth-components";
 import GithubBtn from "../components/github-button";
 import styled from "styled-components";
 
-const Title = styled.h1`
+const Title = styled.p`
   font-size: 100px;
   letter-spacing: 2px;
+  font-stretch: ultra-condensed;
   line-height: 110%;
   font-weight: 900;
   user-select: none;
-  font-stretch: ultra-condensed;
 `;
+
 const WrapperLeft = styled.div`
   height: 100%;
   display: flex;
@@ -68,10 +69,8 @@ export default function CreateAccount() {
     } = e;
     if (name === "password") {
       setPassword(value);
-      console.log(value);
     } else if (name === "email") {
       setemail(value);
-      console.log(value);
     }
   };
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -89,13 +88,14 @@ export default function CreateAccount() {
     } finally {
       setIsLoading(false);
     }
-    console.log(name, email, password);
   };
 
   return (
     <>
       <WrapperLeft>
-        <Title>LOG INTO PHOSHATO</Title>
+        <Title style={{ fontStretch: "ultra-condensed" }}>
+          LOG INTO PHOSHATO
+        </Title>
       </WrapperLeft>
       <WrapperRight>
         <Form onSubmit={onSubmit}>
@@ -119,7 +119,7 @@ export default function CreateAccount() {
         </Form>
         {error !== "" ? <Error>{error}</Error> : null}
         <Switcher>
-          Don's have an account? <Link to="/create-account">Let's Create</Link>
+          Don't have an account? <Link to="/create-account">Let's Create</Link>
         </Switcher>
         <Switcher>
           forgot password? <Link to="/reset-password">reset password</Link>
