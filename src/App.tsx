@@ -12,6 +12,10 @@ import { auth } from "./firebase";
 import ProtectedRoute from "./components/protected-route";
 import ResetPassword from "./routes/reset-password";
 import Search from "./routes/search";
+import MyPosts from "./routes/my-posts";
+import Test from "./routes/text-route";
+import Saved from "./routes/saved";
+import PostDetail from "./routes/post-detail";
 
 const GlobalStyle = createGlobalStyle`
 
@@ -22,6 +26,7 @@ const GlobalStyle = createGlobalStyle`
   }
   * {
     box-sizing: border-box;
+    margin: 0;
     font-family: --main-font-family, system-ui, -apple-system,
       BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
       "Open Sans", "Helvetica Neue", sans-serif;
@@ -59,6 +64,22 @@ const router = createBrowserRouter([
       {
         path: "search",
         element: <Search />,
+      },
+      {
+        path: "my-posts",
+        element: <MyPosts />,
+      },
+      {
+        path: "test-page",
+        element: <Test />,
+      },
+      {
+        path: "saved",
+        element: <Saved />,
+      },
+      {
+        path: "post-detail",
+        element: <PostDetail />,
       },
     ],
   },

@@ -6,28 +6,28 @@ import { FirebaseError } from "firebase/app";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
+const Wrapper = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 420px;
+  padding: 100px 0px;
+  user-select: none;
+`;
+
+const Switcher = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 50px;
+`;
+
 export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setemail] = useState("");
   const [error, setError] = useState("");
-
-  const Wrapper = styled.div`
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 420px;
-    padding: 100px 0px;
-    user-select: none;
-  `;
-
-  const Switcher = styled.div`
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    margin-top: 50px;
-  `;
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
@@ -45,7 +45,7 @@ export default function ResetPassword() {
     try {
       setIsLoading(true);
       await sendPasswordResetEmail(auth, email); // await 키워드 추가
-      console.log("Password reset email sent successfully!");
+      alert("Password reset email sent successfully!");
     } catch (err) {
       if (err instanceof FirebaseError) {
         setError(err.message);
@@ -57,7 +57,7 @@ export default function ResetPassword() {
 
   return (
     <Wrapper>
-      <Title>[ RESET PASSWORD ]</Title>
+      <Title>RESET PASSWORD</Title>
       <Input
         value={email}
         name="email"
@@ -73,8 +73,9 @@ export default function ResetPassword() {
             color: "white",
             padding: "11px 10px",
             borderRadius: "50px",
+            backgroundColor: "#000000c8",
             border: "none",
-            width: "50%",
+            width: "32%",
             fontSize: "16px",
             cursor: "pointer",
             textAlign: "left",

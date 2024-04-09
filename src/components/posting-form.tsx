@@ -7,14 +7,14 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 `;
 const TextArea = styled.textarea`
-  border: 2px solid black;
+  border: 2px solid #000000c8;
   padding: 20px;
   border-radius: 20px;
   font-size: 16px;
-  color: black;
+  color: #000000c8;
   background-color: white;
   width: 100%;
   resize: none;
@@ -25,17 +25,13 @@ const TextArea = styled.textarea`
       BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
       "Open Sans", "Helvetica Neue", sans-serif;
   }
-  &:focus {
-    outline: none;
-    border-color: tomato;
-  }
 `;
 const AttachFileButton = styled.label`
   padding: 10px 0;
-  color: tomato;
+  color: #000000c8;
   text-align: center;
   border-radius: 20px;
-  border: 1px solid tomato;
+  border: 1px solid #000000c8;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -44,8 +40,8 @@ const AttachFileInput = styled.input`
   display: none;
 `;
 const SubmitButton = styled.input`
-  background-color: tomato;
-  color: black;
+  background-color: #000000c8;
+  color: white;
   border: none;
   padding: 10px 0px;
   border-radius: 20px;
@@ -85,6 +81,10 @@ export default function PostingForm() {
         createdAt: Date.now(),
         username: user.displayName || "익명",
         userId: user.uid,
+        hasPhoto: false,
+        likesNumber: 0,
+        likesUserList: [],
+        SavedUserList: [],
       });
       if (file) {
         const locationRef = ref(
@@ -94,6 +94,7 @@ export default function PostingForm() {
         const result = await uploadBytes(locationRef, file);
         const url = await getDownloadURL(result.ref);
         await updateDoc(doc, {
+          hasPhoto: true,
           photo: url,
         });
       }
@@ -110,11 +111,11 @@ export default function PostingForm() {
     <Form onSubmit={onSubmit}>
       <TextArea
         required
-        rows={5}
+        rows={9}
         maxLength={200}
         onChange={onchange}
         value={post}
-        placeholder="what's happening?"
+        placeholder="사진에 대한 얘기를 !"
       />
       <AttachFileButton htmlFor="file">
         {file ? "Photo added ✅" : "Add Photo"}

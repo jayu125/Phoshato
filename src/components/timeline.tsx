@@ -8,8 +8,8 @@ import {
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { db } from "../firebase";
-import Post from "./post";
 import { Unsubscribe } from "firebase/auth";
+import PostPreview from "./post-preview";
 
 export interface IPost {
   id: string;
@@ -18,13 +18,26 @@ export interface IPost {
   userId: string;
   username: string;
   createdAt: number;
+  hasPhoto: boolean;
+  likesNumber: number;
+  likesUserIdList: Array<String>;
+  SavedUserList: Array<String>;
 }
 
-const Wrapper = styled.div`
+// const Wrapper = styled.div`
+//   display: flex;
+//   gap: 10px;
+//   flex-direction: column;
+//   overflow-y: scroll;
+// `;
+
+const Posts = styled.div`
   display: flex;
-  gap: 10px;
   flex-direction: column;
-  overflow-y: scroll;
+  gap: 10px;
+  width: 100%;
+  border-left: 3px solid #000000c8;
+  border-right: 3px solid #000000c8;
 `;
 
 export default function Timeline() {
@@ -41,10 +54,32 @@ export default function Timeline() {
 
       unsubscribe = await onSnapshot(postsQuery, (snapshot) => {
         const posts = snapshot.docs.map((doc) => {
-          const { post, createdAt, userId, username, photo } = doc.data();
-          return { post, createdAt, userId, username, photo, id: doc.id };
+          const {
+            post,
+            hasPhoto,
+            createdAt,
+            userId,
+            username,
+            photo,
+            likesNumber,
+            likesUserIdList,
+            SavedUserList,
+          } = doc.data();
+          return {
+            post,
+            hasPhoto,
+            createdAt,
+            userId,
+            username,
+            photo,
+            id: doc.id,
+            likesNumber,
+            likesUserIdList,
+            SavedUserList,
+          };
         });
         setPost(posts);
+        console.log(posts);
       });
     };
     fetchPotsts();
@@ -54,10 +89,18 @@ export default function Timeline() {
   }, []);
 
   return (
-    <Wrapper>
+    <Posts>
       {post.map((post) => (
-        <Post key={post.id} {...post} />
+        <PostPreview key={post.id} {...post} />
       ))}
-    </Wrapper>
+    </Posts>
   );
 }
+
+// return (
+//   <Wrapper>
+//     {post.map((post) => (
+//       <Post key={post.id} {...post} />
+//     ))}
+//   </Wrapper>
+// );

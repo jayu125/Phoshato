@@ -8,12 +8,21 @@ import GithubBtn from "../components/github-button";
 import styled from "styled-components";
 
 const Title = styled.p`
-  font-size: 100px;
-  letter-spacing: 2px;
-  font-stretch: ultra-condensed;
-  line-height: 110%;
-  font-weight: 900;
+  font-size: 110px;
+  letter-spacing: -5px;
+  line-height: 90%;
+  font-weight: 700;
   user-select: none;
+  font-stretch: 100%;
+  background-image: linear-gradient(
+    160deg,
+    #7aa9c9 0%,
+    #316e6776 50%,
+    #7aa9c9 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 `;
 
 const WrapperLeft = styled.div`
@@ -46,13 +55,35 @@ const WrapperRight = styled.div`
 const Input = styled.input`
   padding: 15px 20px;
   border: none;
+  border-radius: 10px;
   width: 100%;
-  font-size: 16px;
+  font-weight: bold;
+  font-size: 17px;
   &[type="submit"] {
     cursor: pointer;
+    opacity: 0.9;
+    background: linear-gradient(
+      -45deg,
+      #ffa946a4,
+      #fa5486ac,
+      #5da1fa8b,
+      #4cfcd397
+    );
+    background-size: 150%;
+    animation: anime 16s linear infinite;
     &:hover {
-      opacity: 0.8;
+      opacity: 0.75;
     }
+  }
+  &[type="text"],
+  &[type="email"],
+  &[type="password"] {
+    background: linear-gradient(
+      135deg,
+      rgb(255, 255, 255),
+      rgba(230, 230, 230, 0.548),
+      rgba(184, 184, 184, 0.678)
+    );
   }
 `;
 
@@ -119,10 +150,16 @@ export default function CreateAccount() {
         </Form>
         {error !== "" ? <Error>{error}</Error> : null}
         <Switcher>
-          Don't have an account? <Link to="/create-account">Let's Create</Link>
+          Don't have an account?{" "}
+          <Link to="/create-account" style={{ color: "black" }}>
+            Let's Create
+          </Link>
         </Switcher>
         <Switcher>
-          forgot password? <Link to="/reset-password">reset password</Link>
+          forgot password?{" "}
+          <Link to="/reset-password" style={{ color: "black" }}>
+            reset password
+          </Link>
         </Switcher>
         <GithubBtn />
       </WrapperRight>
