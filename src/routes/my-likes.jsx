@@ -9,9 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { auth, db } from "../firebase";
-import { IPost } from "../components/timeline";
-import Post from "../components/post";
-import { Title } from "../components/auth-components";
+
 import PostPreview from "../components/post-preview";
 
 const Posts = styled.div`
@@ -26,13 +24,13 @@ const BackgroundColor = styled.div`
   /* background-color: #b1b1b114; //임시임 */
 `;
 
-export default function MyPosts({ userIdPram }) {
-  const [posts, setPosts] = useState<IPost[]>([]);
+export default function MyLikes({ userIdPram }) {
+  const [posts, setPosts] = useState([]);
   const user = auth.currentUser;
   const fetchPosts = async () => {
     const postQuery = query(
       collection(db, "posts"),
-      where("userId", "==", userIdPram),
+      where("likesUserList", "array-contains", userIdPram),
       orderBy("createdAt", "desc"),
       limit(30)
     );
@@ -73,7 +71,7 @@ export default function MyPosts({ userIdPram }) {
         <PostPreview key={post.id} {...post} />
       ))}
       <h1 style={{ position: "absolute", zIndex: "-1", marginTop: "20px" }}>
-        아직 글이 없는 것 같아요...
+        아직 좋아요 한 글이 없는 것 같아요...
       </h1>
     </Posts>
   );

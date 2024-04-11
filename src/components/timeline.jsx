@@ -8,21 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { db } from "../firebase";
-import { Unsubscribe } from "firebase/auth";
 import PostPreview from "./post-preview";
-
-export interface IPost {
-  id: string;
-  photo?: string;
-  post: string;
-  userId: string;
-  username: string;
-  createdAt: number;
-  hasPhoto: boolean;
-  likesNumber: number;
-  likesUserIdList: Array<String>;
-  SavedUserList: Array<String>;
-}
 
 // const Wrapper = styled.div`
 //   display: flex;
@@ -40,10 +26,10 @@ const Posts = styled.div`
 `;
 
 export default function Timeline() {
-  const [post, setPost] = useState<IPost[]>([]);
+  const [post, setPost] = useState([]);
 
   useEffect(() => {
-    let unsubscribe: Unsubscribe | null = null;
+    let unsubscribe = null;
     const fetchPotsts = async () => {
       const postsQuery = query(
         collection(db, "posts"),

@@ -94,7 +94,7 @@ export default function CreateAccount() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (e) => {
     const {
       target: { name, value },
     } = e;
@@ -104,7 +104,7 @@ export default function CreateAccount() {
       setemail(value);
     }
   };
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (isLoading || email === "" || password === "") return;

@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { IPost } from "./timeline";
 import { auth, db, storage } from "../firebase";
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
@@ -101,7 +100,7 @@ const CancelButton = styled.button`
   margin-left: 10px;
 `;
 
-export default function Post({ username, photo, post, userId, id }: IPost) {
+export default function Post({ username, photo, post, userId, id }) {
   const [isEditing, setIsEditing] = useState(false);
   const [updatedDetail, setUpdatedDetail] = useState("");
 
@@ -138,7 +137,7 @@ export default function Post({ username, photo, post, userId, id }: IPost) {
     }
   };
 
-  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const onChange = (e) => {
     setUpdatedDetail(e.target.value);
   };
 

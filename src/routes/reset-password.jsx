@@ -29,13 +29,13 @@ export default function ResetPassword() {
   const [email, setemail] = useState("");
   const [error, setError] = useState("");
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (e) => {
     const {
       target: { value },
     } = e;
     setemail(value);
   };
-  const onClick = async (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+  const onClick = async (e) => {
     e.preventDefault();
     setError("");
     if (isLoading || email === "") {

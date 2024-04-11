@@ -1,11 +1,4 @@
-import {
-  addDoc,
-  collection,
-  deleteField,
-  doc,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { deleteField, doc, getDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { auth, db, storage } from "../firebase";
@@ -96,15 +89,16 @@ const DeletePhotoButton = styled.label`
 export default function EditForm({ postId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [updatedPost, setupdatedPost] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState(null);
+
   const [oldFile, setOldFile] = useState(false);
   const [hidePhoto, setHidePhoto] = useState(false);
   const [hideClassName, setHideClassName] = useState("");
 
-  const onchange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const onchange = (e) => {
     setupdatedPost(e.target.value);
   };
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = (e) => {
     const { files } = e.target;
     if (files && files.length === 1) {
       setFile(files[0]);
@@ -127,7 +121,7 @@ export default function EditForm({ postId }) {
     work();
   }, []);
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const user = auth.currentUser;
     if (!user || isLoading || updatedPost === "" || updatedPost.length > 400)

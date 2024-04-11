@@ -58,12 +58,12 @@ const SubmitButton = styled.input`
 export default function PostingForm() {
   const [isLoading, setLoading] = useState(false);
   const [post, setPost] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState(null);
 
-  const onchange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const onchange = (e) => {
     setPost(e.target.value);
   };
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = (e) => {
     const { files } = e.target;
     if (files && files.length === 1) {
       setFile(files[0]);
@@ -75,7 +75,7 @@ export default function PostingForm() {
     navigate("/");
   };
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const user = auth.currentUser;
     if (!user || isLoading || post === "" || post.length > 400) return;

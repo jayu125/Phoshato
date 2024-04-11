@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { auth } from "../firebase";
 import ReactModal from "react-modal";
@@ -123,7 +123,7 @@ const NewPostButton = styled.div`
 
 /*overlay는 모달 창 바깥 부분을 처리하는 부분이고,
 content는 모달 창부분이라고 생각하면 쉬울 것이다*/
-const customModalStyles: ReactModal.Styles = {
+const customModalStyles = {
   overlay: {
     // backgroundColor: " rgba(0, 0, 0, 0.4)",
     width: "100%",

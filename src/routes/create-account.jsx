@@ -5,8 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { Error, Switcher } from "../components/auth-components";
 import styled from "styled-components";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
-import { ref } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore";
 
 const Title = styled.h1`
   font-size: 110px;
@@ -104,7 +103,7 @@ export default function CreateAccount() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (e) => {
     const {
       target: { name, value },
     } = e;
@@ -116,7 +115,7 @@ export default function CreateAccount() {
       setemail(value);
     }
   };
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (isLoading || name === "" || email === "" || password === "") return;

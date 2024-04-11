@@ -1,7 +1,6 @@
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
-import { IPost } from "../components/timeline";
 import styled from "styled-components";
 import PostPreview from "../components/post-preview";
 
@@ -15,7 +14,7 @@ const Posts = styled.div`
 `;
 
 export default function Test() {
-  const [posts, setPosts] = useState<IPost[]>([]);
+  const [posts, setPosts] = useState([]);
   const fetchPosts = async () => {
     const postQuery = query(
       collection(db, "posts"),

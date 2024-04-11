@@ -1,35 +1,30 @@
-import styled from "styled-components";
-import { IPost } from "./timeline";
-import { auth, db, storage } from "../firebase";
-import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref } from "firebase/storage";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { auth, db, storage } from "../firebase";
 import { useEffect, useRef, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { deleteDoc, doc } from "firebase/firestore";
+import { getDoc, updateDoc } from "firebase/firestore";
+import ReactModal from "react-modal";
+import EditForm from "../components/edit-form";
 
 const Wrapper = styled.div`
   display: flex;
-  flex-direction: column;
-  background-color: white;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
-`;
-
-const WrapperLink = styled(NavLink)`
-  padding: 15px 17px;
-  display: grid;
-  grid-template-columns: 1fr 8fr 1fr;
-  /* background-color: #b1b1b144; */
-  /* border-radius: 18px; */
-
-  border-top: 2px solid #000000c8;
   width: 100%;
   min-height: 135px;
-  text-decoration-line: none;
-  color: #000000c8;
+  flex-direction: column;
+  border-left: 3px solid #000000c8;
+  border-right: 3px solid #000000c8;
+`;
 
-  &:hover {
-    background-color: #b1b1b144;
-    cursor: pointer;
-  }
+const PostWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 8fr 1fr;
+  width: 100%;
+  min-height: 135px;
+  color: #000000c8;
+  padding: 15px 17px;
+  border-top: 3px solid #000000c8;
 `;
 
 const LeftSide = styled.div`
@@ -37,11 +32,39 @@ const LeftSide = styled.div`
 `;
 
 const MiddleSide = styled.div`
+  overflow: scroll;
   padding-left: 5px;
+  width: 100%;
 `;
 
 const RightSide = styled.div`
   position: relative;
+`;
+
+const AvatarImg = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-left: 4px;
+  user-select: none;
+  &:hover {
+    background-color: #b1b1b144;
+  }
+`;
+
+const AvatarUpload = styled(NavLink)`
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+`;
+
+const Payload = styled.p`
+  width: 100%;
+  margin: 7px 0px;
+  font-size: 15px;
+  font-family: "Noto Sans KR";
+  font-weight: 500;
+  user-select: none;
 `;
 
 const Row = styled.div`
@@ -55,6 +78,13 @@ const Photo = styled.img`
   width: 100%;
   height: 100%;
   user-select: none;
+  border-radius: 15px;
+`;
+
+const Namebox = styled.div`
+  height: 20px;
+  display: flex;
+  align-items: center;
 `;
 
 const Username = styled.span`
@@ -64,32 +94,89 @@ const Username = styled.span`
   user-select: none;
 `;
 
-const Payload = styled.p`
-  margin: 5px 0px;
-  font-size: 15px;
-  font-family: "Noto Sans KR";
-  font-weight: 700;
-  user-select: none;
-`;
-
-const AvatarImg = styled.img`
-  width: 40px;
-  height: 40px;
+const MeatBallMenu = styled.button`
+  border: 0;
+  width: 37px;
+  height: 37px;
+  background: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' class='w-6 h-6'%3E%3Cpath fill-rule='evenodd' d='M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm6 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm6 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z' clip-rule='evenodd' /%3E%3C/svg%3E%0A");
   border-radius: 50%;
-  margin-left: 4px;
-  user-select: none;
+  position: absolute;
+  left: 55%;
+  top: 15px;
+  transform: translate(-50%, -50%);
+
+  cursor: pointer;
+  &:hover {
+    background-color: #f1f1f1;
+  }
+`;
+const OpendMeatballMenu = styled.div`
+  background-color: #ffffff;
+  width: 70px;
+  height: 70px;
+  border-radius: 18px;
+  position: absolute;
+  top: 35px;
+  overflow: hidden;
+  box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.12);
 `;
 
-const AvatarUpload = styled.label`
-  width: 40px;
-  height: 40px;
-  display: inline-block;
+const DeleteButton = styled.button`
+  background-color: white;
+  color: black;
+  font-weight: 600;
+  width: 100%;
+  height: 50%;
+  border: 0;
+  font-size: 12px;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  cursor: pointer;
+  &:hover {
+    background-color: #000000c8;
+    color: white;
+  }
 `;
 
-const Namebox = styled.div`
-  height: 20px;
+const EditButton = styled.button`
+  background-color: white;
+  color: black;
+  font-weight: 600;
+  width: 100%;
+  height: 50%;
+  border: 0;
+  font-size: 12px;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  cursor: pointer;
+  &:hover {
+    background-color: #000000c8;
+    color: white;
+  }
+`;
+
+const UpperBar = styled.div`
+  height: 60px;
   display: flex;
   align-items: center;
+`;
+const Arrow = styled.button`
+  padding: 10px;
+  height: 100%;
+  width: 58px;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  &:hover {
+    background-color: #b1b1b144;
+    cursor: pointer;
+  }
+`;
+const Title = styled.span`
+  font-family: "Noto Sans KR";
+  font-size: 25px;
+  font-weight: 700;
 `;
 
 const UnderBar = styled.div`
@@ -170,90 +257,71 @@ const SaveButton = styled.button`
   background-size: 90%;
 `;
 
-const MeatBallMenu = styled.button`
-  border: 0;
-  width: 37px;
-  height: 37px;
-  background: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' class='w-6 h-6'%3E%3Cpath fill-rule='evenodd' d='M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm6 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm6 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z' clip-rule='evenodd' /%3E%3C/svg%3E%0A");
-  border-radius: 50%;
-  position: absolute;
-  left: 55%;
-  top: 15px;
-  transform: translate(-50%, -50%);
+const customModalStyles = {
+  overlay: {
+    // backgroundColor: " rgba(0, 0, 0, 0.4)",
+    width: "100%",
+    height: "100vh",
+    zIndex: "10",
+    position: "fixed",
+    top: "0",
+    left: "0",
+  },
+  content: {
+    zIndex: "150",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    borderRadius: "20px",
+    boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)",
+    backgroundColor: "white",
+    justifyContent: "center",
+    overflow: "auto",
+  },
+};
 
-  cursor: pointer;
-  &:hover {
-    background-color: #f1f1f1;
-  }
-`;
-const OpendMeatballMenu = styled.div`
-  background-color: #ffffff;
-  width: 70px;
-  height: 70px;
-  border-radius: 18px;
-  position: absolute;
-  top: 35px;
-  overflow: hidden;
-`;
-
-const DeleteButton = styled.button`
-  background-color: white;
-  color: black;
-  font-weight: 600;
-  width: 100%;
-  height: 50%;
-  border: 0;
-  font-size: 12px;
-  padding: 5px 10px;
-  text-transform: uppercase;
-  cursor: pointer;
-  &:hover {
-    background-color: #000000c8;
-    color: white;
-  }
-`;
-
-const EditButton = styled.button`
-  background-color: white;
-  color: black;
-  font-weight: 600;
-  width: 100%;
-  height: 50%;
-  border: 0;
-  font-size: 12px;
-  padding: 5px 10px;
-  text-transform: uppercase;
-  cursor: pointer;
-  &:hover {
-    background-color: #000000c8;
-    color: white;
-  }
-`;
-
-const ImageLoadingImg = styled.img``;
-
-export default function PostPreview({
-  username,
-  photo,
-  post,
-  userId,
-  id,
-  hasPhoto,
-  likesNumber,
-  likesUserIdList,
-  SavedUserList,
-}: IPost) {
+export default function PostDetail() {
   const user = auth.currentUser;
-  const [isEditing, setIsEditing] = useState(false);
-  const [updatedDetail, setUpdatedDetail] = useState("");
-  const [isPoped, setIsPoped] = useState(false);
+  const location = useLocation();
+  const {
+    username,
+    photo,
+    post,
+    userId,
+    id,
+    hasPhoto,
+    likesNumber,
+    likesUserIdList,
+    SavedUserList,
+  } = location.state; //정보 전달받기
   const [avatar, setAvatar] = useState(user?.photoURL);
   const [isDefaltProfileImg, setIsDefaltProfileImg] = useState(true);
   const [isOpend, setIsopend] = useState(false);
-  const [isImgLoading, setIsImgLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [isLikedPost, setIslikedPost] = useState("");
   const [isSavedPost, setIsSavedPost] = useState("");
+  const [modalOpend, setModalOpend] = useState(false);
+
+  const navigate = useNavigate();
+  const onClickBackPage = () => {
+    navigate(-1);
+  };
+
+  const fetchAvatar = async () => {
+    try {
+      const profileImgRef = ref(storage, `avatars/${userId}`);
+      const avatarUrl = await getDownloadURL(ref(storage, profileImgRef));
+      setIsDefaltProfileImg(false);
+      setAvatar(avatarUrl);
+    } catch (err) {
+      setIsDefaltProfileImg(true);
+    }
+  };
+
+  useEffect(() => {
+    fetchAvatar();
+  }, []);
 
   //지우기
   const onDelete = async () => {
@@ -269,6 +337,8 @@ export default function PostPreview({
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      onClickBackPage();
     }
   };
   //----------------------------------------------------------------------
@@ -278,54 +348,19 @@ export default function PostPreview({
     if (user?.uid !== userId) return;
     try {
       setIsEditing(true);
-      setUpdatedDetail(post);
+      handleModalOpen();
     } catch (err) {
       console.log(err);
     } finally {
     }
   };
 
-  //-------------------------------------------
-
-  //포스트에 띄울 프로필 사진 체크
-
-  const fetchAvatar = async () => {
-    try {
-      const profileImgRef = ref(storage, `avatars/${userId}`);
-      const avatarUrl = await getDownloadURL(ref(storage, profileImgRef));
-      setIsDefaltProfileImg(false);
-      setAvatar(avatarUrl);
-    } catch (err) {
-      setIsDefaltProfileImg(true);
-    }
-  };
-
-  //위에꺼 여기서 실행쓰
-  useEffect(() => {
-    fetchAvatar();
-  }, []);
-
-  const openMeatball = () => {
-    setIsopend(true);
-  };
-
-  //------------------------------------
-
-  // 기다리기 함수
-  function wait(sec) {
-    let start = Date.now(),
-      now = start;
-    while (now - start < sec * 1000) {
-      now = Date.now();
-    }
-  }
-  //----------------------
   //미트볼 모달 바깥 클릭 시 팝업 해제
 
   const modalRef = useRef();
 
   useEffect(() => {
-    const clickOutside = (e: React.MouseEvent<HTMLDivElement>) => {
+    const clickOutside = (e) => {
       if (isOpend && !modalRef.current.contains(e.target)) {
         setIsopend(false);
       }
@@ -338,10 +373,14 @@ export default function PostPreview({
     };
   }, [isOpend]);
 
+  const openMeatball = () => {
+    setIsopend(true);
+  };
+
   // --------------------------------------------------------------------
   //좋아요버튼
 
-  async function handleLike(id: string) {
+  async function handleLike(id) {
     //포스트id 를 인수로 받아옴
     const user = auth.currentUser;
     const docRef = doc(db, "posts", `${id}`);
@@ -389,8 +428,9 @@ export default function PostPreview({
   }, []);
 
   //------------------
+
   //저장 버튼
-  async function handleSave(id: string) {
+  async function handleSave(id) {
     //포스트id 를 인수로 받음
 
     const user = auth.currentUser;
@@ -439,25 +479,46 @@ export default function PostPreview({
   }, []);
 
   //------------------
-  //----------------------------------------------------------------------
+
+  const handleModalOpen = () => {
+    setModalOpend(!modalOpend);
+  };
+
   return (
     <Wrapper>
-      <WrapperLink
-        to={`/post-detail`}
-        state={{
-          username: username,
-          photo: photo,
-          post: post,
-          userId: userId,
-          id: id,
-          hasPhoto: hasPhoto,
-          likesNumber: likesNumber,
-          likesUserIdList: likesUserIdList,
-          SavedUserList: SavedUserList,
-        }}
-      >
+      <UpperBar>
+        <Arrow onClick={onClickBackPage}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              fillRule="evenodd"
+              d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </Arrow>
+        <Title>{username}'s post</Title>
+      </UpperBar>
+      <PostWrapper>
         <LeftSide>
-          <AvatarUpload>
+          <AvatarUpload
+            to={"/user-profile"}
+            state={{
+              username: username,
+              photo: photo,
+              post: post,
+              userId: userId,
+              id: id,
+              hasPhoto: hasPhoto,
+              likesNumber: likesNumber,
+              likesUserIdList: likesUserIdList,
+              SavedUserList: SavedUserList,
+            }}
+          >
             {isDefaltProfileImg ? (
               <AvatarImg src="../public/user.svg" />
             ) : (
@@ -472,10 +533,22 @@ export default function PostPreview({
             </Namebox>
             <Payload>{post}</Payload>
           </>
-          <Row>{hasPhoto && photo ? <Photo src={photo} /> : null}</Row>
+          <Row>{photo ? <Photo src={photo} /> : null}</Row>
         </MiddleSide>
-        <RightSide></RightSide>
-      </WrapperLink>
+        <RightSide>
+          {user?.uid === userId ? (
+            <>
+              <MeatBallMenu onClick={openMeatball}></MeatBallMenu>
+              {isOpend ? (
+                <OpendMeatballMenu ref={modalRef}>
+                  <DeleteButton onClick={onDelete}>Delete</DeleteButton>
+                  <EditButton onClick={onEdit}>Edit</EditButton>
+                </OpendMeatballMenu>
+              ) : null}
+            </>
+          ) : null}
+        </RightSide>
+      </PostWrapper>
       <UnderBar>
         <LikeButton
           className={`${isLikedPost}`}
@@ -491,6 +564,13 @@ export default function PostPreview({
           }}
         ></SaveButton>
       </UnderBar>
+      <ReactModal
+        style={customModalStyles}
+        isOpen={modalOpend}
+        onRequestClose={() => setModalOpend(false)}
+      >
+        <EditForm postId={id} />
+      </ReactModal>
     </Wrapper>
   );
 }
