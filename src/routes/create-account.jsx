@@ -137,7 +137,7 @@ export default function CreateAccount() {
 
       const document = await setDoc(doc(db, "users", `${user?.uid}`), {
         createdAt: Date.now(),
-        username: user.displayName || "익명",
+        username: user.displayName,
         userId: user.uid,
         followedUser: [],
         followingUser: [],
