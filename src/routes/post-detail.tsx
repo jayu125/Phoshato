@@ -1,11 +1,13 @@
 import { deleteObject, getDownloadURL, ref } from "firebase/storage";
-import { useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { useEffect, useRef, useState } from "react";
 import { DocumentData, deleteDoc, doc } from "firebase/firestore";
 import handleLike from "../components/Like-and-dislike";
 import { collection, getDoc, updateDoc } from "firebase/firestore";
+import ReactModal from "react-modal";
+import EditForm from "../components/edit-form";
 
 const Wrapper = styled.div`
   display: flex;
@@ -46,9 +48,12 @@ const AvatarImg = styled.img`
   border-radius: 50%;
   margin-left: 4px;
   user-select: none;
+  &:hover {
+    background-color: #b1b1b144;
+  }
 `;
 
-const AvatarUpload = styled.label`
+const AvatarUpload = styled(NavLink)`
   width: 40px;
   height: 40px;
   display: inline-block;
@@ -253,6 +258,30 @@ const SaveButton = styled.button`
   background-size: 90%;
 `;
 
+const customModalStyles: ReactModal.Styles = {
+  overlay: {
+    // backgroundColor: " rgba(0, 0, 0, 0.4)",
+    width: "100%",
+    height: "100vh",
+    zIndex: "10",
+    position: "fixed",
+    top: "0",
+    left: "0",
+  },
+  content: {
+    zIndex: "150",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    borderRadius: "20px",
+    boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)",
+    backgroundColor: "white",
+    justifyContent: "center",
+    overflow: "auto",
+  },
+};
+
 export default function PostDetail() {
   const user = auth.currentUser;
   const location = useLocation();
@@ -273,6 +302,7 @@ export default function PostDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLikedPost, setIslikedPost] = useState("");
   const [isSavedPost, setIsSavedPost] = useState("");
+  const [modalOpend, setModalOpend] = useState(false);
 
   const navigate = useNavigate();
   const onClickBackPage = () => {
@@ -319,7 +349,7 @@ export default function PostDetail() {
     if (user?.uid !== userId) return;
     try {
       setIsEditing(true);
-      setUpdatedDetail(post);
+      handleModalOpen();
     } catch (err) {
       console.log(err);
     } finally {
@@ -361,6 +391,7 @@ export default function PostDetail() {
     const likedList = likesUserList; //likedUserList 컬랙션
 
     if (likedList.includes(`${user?.uid}`)) {
+      setIslikedPost("");
       const findIndex = likedList.indexOf(`${user.uid}`);
 
       if (findIndex > -1) {
@@ -370,14 +401,13 @@ export default function PostDetail() {
       await updateDoc(docRef, {
         likesUserList: likedList,
       });
-      setIslikedPost("");
     } else {
+      setIslikedPost("likedClass");
       likedList.push(`${user?.uid}`);
 
       await updateDoc(docRef, {
         likesUserList: likedList,
       });
-      setIslikedPost("likedClass");
     }
   }
 
@@ -403,7 +433,7 @@ export default function PostDetail() {
   //저장 버튼
   async function handleSave(id: string) {
     //포스트id 를 인수로 받음
-    console.log(isSavedPost);
+
     const user = auth.currentUser;
     const docRef = doc(db, "posts", `${id}`);
     const fetchedDoc = getDoc(docRef);
@@ -412,6 +442,7 @@ export default function PostDetail() {
     const savedList = SavedUserList; //likedUserList 컬랙션
 
     if (savedList.includes(`${user?.uid}`)) {
+      setIsSavedPost("");
       const findIndex = savedList.indexOf(`${user.uid}`);
 
       if (findIndex > -1) {
@@ -421,16 +452,14 @@ export default function PostDetail() {
       await updateDoc(docRef, {
         SavedUserList: savedList,
       });
-      setIsSavedPost("");
     } else {
+      setIsSavedPost("savedClass");
       savedList.push(`${user?.uid}`);
 
       await updateDoc(docRef, {
         SavedUserList: savedList,
       });
-      setIsSavedPost("savedClass");
     }
-    console.log(isSavedPost);
   }
 
   useEffect(() => {
@@ -451,6 +480,10 @@ export default function PostDetail() {
   }, []);
 
   //------------------
+
+  const handleModalOpen = () => {
+    setModalOpend(!modalOpend);
+  };
 
   return (
     <Wrapper>
@@ -473,7 +506,20 @@ export default function PostDetail() {
       </UpperBar>
       <PostWrapper>
         <LeftSide>
-          <AvatarUpload>
+          <AvatarUpload
+            to={"/user-profile"}
+            state={{
+              username: username,
+              photo: photo,
+              post: post,
+              userId: userId,
+              id: id,
+              hasPhoto: hasPhoto,
+              likesNumber: likesNumber,
+              likesUserIdList: likesUserIdList,
+              SavedUserList: SavedUserList,
+            }}
+          >
             {isDefaltProfileImg ? (
               <AvatarImg src="../public/user.svg" />
             ) : (
@@ -487,7 +533,6 @@ export default function PostDetail() {
               <Username>{username}</Username>
             </Namebox>
             <Payload>{post}</Payload>
-            <h1>현 상태?{`${isSavedPost}`}</h1>
           </>
           <Row>{photo ? <Photo src={photo} /> : null}</Row>
         </MiddleSide>
@@ -520,6 +565,13 @@ export default function PostDetail() {
           }}
         ></SaveButton>
       </UnderBar>
+      <ReactModal
+        style={customModalStyles}
+        isOpen={modalOpend}
+        onRequestClose={() => setModalOpend(false)}
+      >
+        <EditForm postId={id} />
+      </ReactModal>
     </Wrapper>
   );
 }

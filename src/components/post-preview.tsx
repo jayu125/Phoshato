@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   background-color: white;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.17);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
 `;
 
 const WrapperLink = styled(NavLink)`
@@ -351,6 +351,7 @@ export default function PostPreview({
     const likedList = likesUserList; //likedUserList 컬랙션
 
     if (likedList.includes(`${user?.uid}`)) {
+      setIslikedPost("");
       const findIndex = likedList.indexOf(`${user.uid}`);
 
       if (findIndex > -1) {
@@ -360,14 +361,13 @@ export default function PostPreview({
       await updateDoc(docRef, {
         likesUserList: likedList,
       });
-      setIslikedPost("");
     } else {
+      setIslikedPost("likedClass");
       likedList.push(`${user?.uid}`);
 
       await updateDoc(docRef, {
         likesUserList: likedList,
       });
-      setIslikedPost("likedClass");
     }
   }
 
@@ -381,10 +381,8 @@ export default function PostPreview({
       const likedList = likesUserList; //likedUserList 컬랙션
       if (likedList.includes(`${user?.uid}`)) {
         setIslikedPost("likedClass");
-        console.log("hddhks");
       } else {
         setIslikedPost("");
-        console.log("durl ehlsp");
       }
     };
     working();
@@ -403,6 +401,7 @@ export default function PostPreview({
     const savedList = SavedUserList; //likedUserList 컬랙션
 
     if (savedList.includes(`${user?.uid}`)) {
+      setIsSavedPost("");
       const findIndex = savedList.indexOf(`${user.uid}`);
 
       if (findIndex > -1) {
@@ -412,14 +411,13 @@ export default function PostPreview({
       await updateDoc(docRef, {
         SavedUserList: savedList,
       });
-      setIsSavedPost("");
     } else {
+      setIsSavedPost("savedClass");
       savedList.push(`${user?.uid}`);
 
       await updateDoc(docRef, {
         SavedUserList: savedList,
       });
-      setIsSavedPost("savedClass");
     }
   }
 
@@ -432,11 +430,9 @@ export default function PostPreview({
 
       const savedList = SavedUserList; //likedUserList 컬랙션
       if (savedList.includes(`${user?.uid}`)) {
-        setIsSavedPost("likedClass");
-        console.log("hddhks");
+        setIsSavedPost("savedClass");
       } else {
         setIsSavedPost("");
-        console.log("durl ehlsp");
       }
     };
     working();

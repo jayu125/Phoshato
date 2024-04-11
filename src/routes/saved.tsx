@@ -17,9 +17,11 @@ import PostPreview from "../components/post-preview";
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 10px;
+  gap: 35px;
 
+  padding: 50px;
+  padding-top: 100px;
+  overflow: scroll;
   border-left: 3px solid #000000c8;
   border-right: 3px solid #000000c8;
 `;
@@ -30,6 +32,27 @@ const Posts = styled.div`
   gap: 20px;
   width: 100%;
   z-index: 5;
+`;
+
+const Header = styled.div`
+  width: 646px;
+  height: 55px;
+  background-color: white;
+  color: #000000c8;
+  position: absolute;
+  top: 25px;
+  left: 48.3%;
+  z-index: 100;
+  padding-left: 47px;
+  transform: translate(-50%, -50%);
+  padding-top: 15px;
+`;
+
+const Text = styled.span`
+  font-weight: 700;
+  font-family: "Noto Sans KR";
+  font-size: 40px;
+  user-select: none;
 `;
 
 const BackgroundColor = styled.div`
@@ -78,18 +101,18 @@ export default function MyPosts() {
     fetchPosts();
   }, []);
   return (
-    <BackgroundColor>
-      <Wrapper>
-        <Title>저장된 글</Title>
-        <Posts>
-          {posts.map((post) => (
-            <PostPreview key={post.id} {...post} />
-          ))}
-        </Posts>
-        <h1 style={{ position: "absolute", top: "20%", zIndex: "2" }}>
-          저장된 글이 없는 것 같아요...
-        </h1>
-      </Wrapper>
-    </BackgroundColor>
+    <Wrapper>
+      <Header>
+        <Text>저장된 글</Text>
+      </Header>
+      <Posts>
+        {posts.map((post) => (
+          <PostPreview key={post.id} {...post} />
+        ))}
+      </Posts>
+      <h1 style={{ position: "absolute", top: "20%", zIndex: "2" }}>
+        저장된 글이 없는 것 같아요...
+      </h1>
+    </Wrapper>
   );
 }

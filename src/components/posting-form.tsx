@@ -3,6 +3,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { auth, db, storage } from "../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { useNavigate } from "react-router-dom";
 
 const Form = styled.form`
   display: flex;
@@ -69,10 +70,15 @@ export default function PostingForm() {
     }
   };
 
+  const navigate = useNavigate();
+  const onClickBackPage = () => {
+    navigate("/");
+  };
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const user = auth.currentUser;
-    if (!user || isLoading || post === "" || post.length > 200) return;
+    if (!user || isLoading || post === "" || post.length > 400) return;
 
     try {
       setLoading(true);
@@ -104,6 +110,7 @@ export default function PostingForm() {
       console.log(e);
     } finally {
       setLoading(false);
+      onClickBackPage();
     }
   };
 
@@ -112,7 +119,7 @@ export default function PostingForm() {
       <TextArea
         required
         rows={9}
-        maxLength={200}
+        maxLength={400}
         onChange={onchange}
         value={post}
         placeholder="사진에 대한 얘기를 !"

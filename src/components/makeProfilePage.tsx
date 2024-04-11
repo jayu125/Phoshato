@@ -1,17 +1,17 @@
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { auth, db, storage } from "../firebase";
 import {
   deleteObject,
   getDownloadURL,
   ref,
   uploadBytes,
 } from "firebase/storage";
-import { deleteUser, updateProfile } from "firebase/auth";
-import { auth, db, storage } from "../firebase";
-import { useEffect, useRef, useState } from "react";
-import MyPosts from "./my-posts";
-import MyLikes from "./my-likes";
-import { useNavigate } from "react-router-dom";
-import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
+import MyPosts from "../routes/my-posts";
+import MyLikes from "../routes/my-likes";
+import { updateProfile } from "firebase/auth";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 const Wrapper = styled.div`
   display: flex;
@@ -25,7 +25,6 @@ const AvatarUpload = styled.div`
   z-index: 50;
   border-radius: 50%;
   background-color: white;
-  cursor: pointer;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -212,7 +211,7 @@ const Card = styled.div`
   align-items: center;
   width: 600px;
   height: 200px;
-  margin-top: 25px;
+  margin-top: 10px;
   padding: 30px;
   padding-left: 40px;
   border-radius: 25px;
@@ -271,6 +270,8 @@ const Switch = styled.div`
   justify-content: center;
   align-items: center;
   box-shadow: 0px -5px 5px #5f5f5f57;
+  max-height: 550px;
+  overflow: scroll;
 `;
 
 const SwitchBar = styled.div`
@@ -398,77 +399,99 @@ const BackgroundLevel = styled.div`
 
 const MeatBall = styled.div``;
 
-const Post = styled.div``;
-const LikedPost = styled.div``;
+const UpperBar = styled.div`
+  width: 94%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+`;
+const Arrow = styled.button`
+  padding: 10px;
+  height: 100%;
+  width: 58px;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  &:hover {
+    background-color: #b1b1b144;
+    cursor: pointer;
+  }
+`;
+const Title = styled.span`
+  font-family: "Noto Sans KR";
+  font-size: 25px;
+  font-weight: 700;
+`;
 
-export default function Profile() {
+export default function MakeProfilePage() {
+  const location = useLocation();
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
-  const [backgroundImg, setBackgroundImg] = useState(null);
-  const [isDeletingNow, setIsDeletingNow] = useState(false);
-  const [isBackgroundmDeletingNow, setIsBackgroundDeletingNow] =
-    useState(false);
-  const [isDefaltProfileImg, setIsDefaltProfileImg] = useState(false);
-  const [isDefaltBackgroundImg, setIsDefaltBackgroundImg] = useState(false);
-  const [email, setEmail] = useState("taein071215@naver.com");
+  const [isDefaltProfileImg, setIsDefaltProfileImg] = useState(true);
   const [isSwitched, setIsSwitched] = useState(false);
   const [isFalseSelected, setIsFalseSelected] = useState("selected");
   const [isTrueSelected, setIsTrueSelected] = useState("");
+  const {
+    username,
+    photo,
+    post,
+    userId,
+    id,
+    hasPhoto,
+    likesNumber,
+    likesUserIdList,
+    SavedUserList,
+  } = location.state;
+  const [isDefaltBackgroundImg, setIsDefaltBackgroundImg] = useState(false);
+  const [backgroundImg, setBackgroundImg] = useState(null);
+  const [email, setEmail] = useState("taein071215@naver.com");
   const [isOpend, setIsopend] = useState(false);
   const [backgroundLocation, setBackgroundLocation] = useState(50);
+  const [isDeletingNow, setIsDeletingNow] = useState(true);
+  const [isBackgroundmDeletingNow, setIsBackgroundDeletingNow] =
+    useState(false);
 
-  const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { files } = e.target;
-    if (!user) return;
-    if (files && files.length === 1) {
+  const navigate = useNavigate();
+  const onClickBackPage = () => {
+    navigate(-1);
+  };
+
+  // 프로필 가져오기
+
+  const fetchAvatar = async () => {
+    try {
+      const profileImgRef = ref(storage, `avatars/${userId}`);
+      const avatarUrl = await getDownloadURL(ref(storage, profileImgRef));
       setIsDefaltProfileImg(false);
-      const file = files[0];
-      const locationRef = ref(storage, `avatars/${user?.uid}`);
-      const result = await uploadBytes(locationRef, file);
-      const avatarUrl = await getDownloadURL(result.ref);
       setAvatar(avatarUrl);
-      await updateProfile(user, {
-        photoURL: avatarUrl,
-      });
+    } catch (err) {
+      setIsDefaltProfileImg(true);
     }
   };
 
-  // 미트볼
-  const modalRef = useRef();
-
   useEffect(() => {
-    const clickOutside = (e: React.MouseEvent<HTMLDivElement>) => {
-      if (isOpend && !modalRef.current.contains(e.target)) {
-        setIsopend(false);
-      }
-    };
+    fetchAvatar();
+  }, []);
 
-    document.addEventListener("mousedown", clickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", clickOutside);
-    };
-  }, [isOpend]);
-
-  const openMeatball = () => {
-    setIsopend(!isOpend);
+  const SwitchTrue = () => {
+    setIsSwitched(true);
   };
 
-  //---------------------------------------------------------------------
+  const SwitchFalse = () => {
+    setIsSwitched(false);
+  };
 
-  const onBackgroundChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { files } = e.target;
-    if (!user) return;
-    if (files && files.length === 1) {
-      setIsDefaltBackgroundImg(false);
-      const file = files[0];
-      const locationRef = ref(storage, `background/${user?.uid}`);
-      const result = await uploadBytes(locationRef, file);
-      const backgroundUrl = await getDownloadURL(result.ref);
-      setBackgroundImg(backgroundUrl);
-      await updateProfile(user, {
-        photoURL: backgroundUrl,
-      });
+  //-------------------------------
+
+  //스위치 스테이트
+  const onclick = () => {
+    setIsSwitched(!isSwitched);
+    if (!isSwitched) {
+      setIsTrueSelected("selected");
+      setIsFalseSelected("");
+    } else {
+      setIsTrueSelected("");
+      setIsFalseSelected("selected");
     }
   };
 
@@ -490,6 +513,55 @@ export default function Profile() {
     }
   };
 
+  const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    if (!user) return;
+    if (files && files.length === 1) {
+      setIsDefaltProfileImg(false);
+      const file = files[0];
+      const locationRef = ref(storage, `avatars/${user?.uid}`);
+      const result = await uploadBytes(locationRef, file);
+      const avatarUrl = await getDownloadURL(result.ref);
+      setAvatar(avatarUrl);
+      await updateProfile(user, {
+        photoURL: avatarUrl,
+      });
+    }
+  };
+
+  const onBackgroundChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    if (!user) return;
+    if (files && files.length === 1) {
+      setIsDefaltBackgroundImg(false);
+      const file = files[0];
+      const locationRef = ref(storage, `background/${user?.uid}`);
+      const result = await uploadBytes(locationRef, file);
+      const backgroundUrl = await getDownloadURL(result.ref);
+      setBackgroundImg(backgroundUrl);
+      await updateProfile(user, {
+        photoURL: backgroundUrl,
+      });
+    }
+  };
+
+  const modalRef = useRef();
+
+  const openMeatball = () => {
+    setIsopend(!isOpend);
+  };
+
+  const onLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBackgroundLocation(Math.floor(e.target.value));
+  };
+
+  const saveBgLevel = async () => {
+    const docRef = doc(db, "users", user?.uid);
+    await updateDoc(docRef, {
+      backgroundLevel: backgroundLocation,
+    });
+  };
+
   const onBackgroundImgDelete = async () => {
     const check = confirm("Are you sure to delete Background image?");
     if (!check || isDefaltBackgroundImg) {
@@ -508,85 +580,6 @@ export default function Profile() {
     }
   };
 
-  const backgroundCheck = async () => {
-    try {
-      const backgroundImgRef = ref(storage, `background/${user?.uid}`);
-      const BackgroundUrl = await getDownloadURL(
-        ref(storage, backgroundImgRef)
-      );
-      setIsDefaltBackgroundImg(false);
-      setBackgroundImg(BackgroundUrl);
-    } catch (err) {
-      setIsDefaltBackgroundImg(true);
-    }
-  };
-
-  const profileCheck = async () => {
-    try {
-      const profileImgRef = ref(storage, `avatars/${user?.uid}`);
-      const avatarUrl = await getDownloadURL(ref(storage, profileImgRef));
-      setIsDefaltProfileImg(false);
-      setAvatar(avatarUrl);
-    } catch (err) {
-      setIsDefaltProfileImg(true);
-    }
-  };
-
-  const emailAndBgLevelCheck = async () => {
-    const docRef = doc(db, "users", `${user?.uid}`);
-    const fetchedDoc = getDoc(docRef);
-    const { email, backgroundLevel } = (await fetchedDoc).data();
-    setEmail(email);
-    setBackgroundLocation(backgroundLevel);
-  };
-
-  useEffect(() => {
-    backgroundCheck();
-    profileCheck();
-    emailAndBgLevelCheck();
-  }, []);
-
-  const SwitchTrue = () => {
-    setIsSwitched(true);
-  };
-
-  const SwitchFalse = () => {
-    setIsSwitched(false);
-  };
-
-  //스위치 스테이트
-  const onclick = () => {
-    if (isFalseSelected === "selected") {
-      setIsFalseSelected("");
-    }
-    if (isFalseSelected === "") {
-      setIsFalseSelected("selected");
-    }
-    if (isTrueSelected === "selected") {
-      setIsTrueSelected("");
-    }
-    if (isTrueSelected === "") {
-      setIsTrueSelected("selected");
-    }
-  };
-
-  //-----------------------
-
-  //onLocationChange
-  const onLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBackgroundLocation(Math.floor(e.target.value));
-  };
-
-  useEffect(() => {
-    console.log(backgroundLocation);
-  }, [backgroundLocation]);
-
-  //--------------------------------------------------
-  const navigate = useNavigate();
-  const onClickBackPage = () => {
-    navigate("/login");
-  };
-
   const onDeleteAccount = async () => {
     const ok = confirm("Are you sure to delete your account?");
     if (!ok) return;
@@ -602,18 +595,64 @@ export default function Profile() {
     }
   };
 
-  //마우스 떨어지면 bg level 저장
-  const saveBgLevel = async () => {
-    const docRef = doc(db, "users", user?.uid);
-    await updateDoc(docRef, {
-      backgroundLevel: backgroundLocation,
-    });
+  const backgroundCheck = async () => {
+    try {
+      const backgroundImgRef = ref(storage, `background/${userId}`);
+      const BackgroundUrl = await getDownloadURL(
+        ref(storage, backgroundImgRef)
+      );
+      setIsDefaltBackgroundImg(false);
+      setBackgroundImg(BackgroundUrl);
+    } catch (err) {
+      setIsDefaltBackgroundImg(true);
+    }
   };
 
-  //--------------------------------
+  const profileCheck = async () => {
+    try {
+      const profileImgRef = ref(storage, `avatars/${userId}`);
+      const avatarUrl = await getDownloadURL(ref(storage, profileImgRef));
+      setIsDefaltProfileImg(false);
+      setAvatar(avatarUrl);
+    } catch (err) {
+      setIsDefaltProfileImg(true);
+    }
+  };
+
+  const emailAndBgLevelCheck = async () => {
+    const docRef = doc(db, "users", `${userId}`);
+    const fetchedDoc = getDoc(docRef);
+    const { email, backgroundLevel } = (await fetchedDoc).data();
+    setEmail(email);
+    setBackgroundLocation(backgroundLevel);
+  };
+
+  useEffect(() => {
+    backgroundCheck();
+    profileCheck();
+    emailAndBgLevelCheck();
+  }, []);
 
   return (
     <Wrapper>
+      <UpperBar>
+        <Arrow onClick={onClickBackPage}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              fillRule="evenodd"
+              d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </Arrow>
+        <Title>{username}</Title>
+      </UpperBar>
+
       <Card>
         {Boolean(!isDefaltBackgroundImg) ? (
           <BackgroundDiv bgLevel={-10 * backgroundLocation}>
@@ -625,10 +664,6 @@ export default function Profile() {
         <WhiteBar></WhiteBar>
         <LeftCard>
           <AvatarUpload>
-            <AvatarUploadBtn htmlFor="avatar">Edit</AvatarUploadBtn>
-            <AvatarDeleteBtn onClick={onAvatarImgDelete}>
-              Delete
-            </AvatarDeleteBtn>
             {Boolean(!isDefaltProfileImg) ? (
               <AvatarImg src={avatar} />
             ) : (
@@ -648,39 +683,11 @@ export default function Profile() {
             onChange={onBackgroundChange}
           />
           <NameStuffCard>
-            <Name>{user?.displayName ? user.displayName : "Anonymous"}</Name>
+            <Name>{username ? username : "Anonymous"}</Name>
             {email ? <Email>{email}</Email> : null}
           </NameStuffCard>
         </LeftCard>
-        <RightCard>
-          <MeatBall>
-            <MeatBallMenu onClick={openMeatball}></MeatBallMenu>
-            {isOpend ? (
-              <OpendMeatballMenu ref={modalRef}>
-                <BackgroundHandle>
-                  <BackgroundLocationBar
-                    value={backgroundLocation}
-                    onChange={onLocationChange}
-                    type="range"
-                    onMouseUp={saveBgLevel}
-                  ></BackgroundLocationBar>
-
-                  <BackgroundUploadBtn htmlFor="background">
-                    Edit
-                  </BackgroundUploadBtn>
-
-                  <BackgroundDeleteBtn onClick={onBackgroundImgDelete}>
-                    Delete
-                  </BackgroundDeleteBtn>
-
-                  <AccountDeleteBtn onClick={onDeleteAccount}>
-                    Delete Acount
-                  </AccountDeleteBtn>
-                </BackgroundHandle>
-              </OpendMeatballMenu>
-            ) : null}
-          </MeatBall>
-        </RightCard>
+        <RightCard></RightCard>
       </Card>
       <UnderPage>
         <Switch>
@@ -688,7 +695,6 @@ export default function Profile() {
             <FalseSwitchButton
               className={`${isFalseSelected}`}
               onClick={() => {
-                SwitchFalse();
                 onclick();
               }}
             >
@@ -697,7 +703,6 @@ export default function Profile() {
             <TrueSwitchButton
               className={`${isTrueSelected}`}
               onClick={() => {
-                SwitchTrue();
                 onclick();
               }}
             >
@@ -706,9 +711,9 @@ export default function Profile() {
           </SwitchBar>
           <ScrollDiv>
             {!isSwitched ? (
-              <MyPosts userIdPram={`${user?.uid}`}></MyPosts>
+              <MyPosts userIdPram={`${userId}`}></MyPosts>
             ) : (
-              <MyLikes userIdPram={`${user?.uid}`}></MyLikes>
+              <MyLikes userIdPram={`${userId}`}></MyLikes>
             )}
           </ScrollDiv>
         </Switch>

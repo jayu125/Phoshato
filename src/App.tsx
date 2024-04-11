@@ -16,6 +16,8 @@ import MyPosts from "./routes/my-posts";
 import Test from "./routes/text-route";
 import Saved from "./routes/saved";
 import PostDetail from "./routes/post-detail";
+import MyPostsPage from "./routes/my-post-route";
+import MakeProfilePage from "./components/makeProfilePage";
 
 const GlobalStyle = createGlobalStyle`
 
@@ -67,7 +69,7 @@ const router = createBrowserRouter([
       },
       {
         path: "my-posts",
-        element: <MyPosts />,
+        element: <MyPostsPage />,
       },
       {
         path: "test-page",
@@ -80,6 +82,10 @@ const router = createBrowserRouter([
       {
         path: "post-detail",
         element: <PostDetail />,
+      },
+      {
+        path: "user-profile",
+        element: <MakeProfilePage />,
       },
     ],
   },

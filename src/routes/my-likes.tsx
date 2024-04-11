@@ -26,13 +26,13 @@ const BackgroundColor = styled.div`
   /* background-color: #b1b1b114; //임시임 */
 `;
 
-export default function MyPosts({ userIdPram }) {
+export default function MyLikes({ userIdPram }) {
   const [posts, setPosts] = useState<IPost[]>([]);
   const user = auth.currentUser;
   const fetchPosts = async () => {
     const postQuery = query(
       collection(db, "posts"),
-      where("userId", "==", userIdPram),
+      where("likesUserList", "array-contains", userIdPram),
       orderBy("createdAt", "desc"),
       limit(30)
     );
@@ -73,7 +73,7 @@ export default function MyPosts({ userIdPram }) {
         <PostPreview key={post.id} {...post} />
       ))}
       <h1 style={{ position: "absolute", zIndex: "-1", marginTop: "20px" }}>
-        아직 글이 없는 것 같아요...
+        아직 좋아요 한 글이 없는 것 같아요...
       </h1>
     </Posts>
   );

@@ -1,10 +1,12 @@
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { Error, Switcher } from "../components/auth-components";
 import styled from "styled-components";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { ref } from "firebase/storage";
 
 const Title = styled.h1`
   font-size: 110px;
@@ -125,17 +127,29 @@ export default function CreateAccount() {
         email,
         password
       );
-      console.log(credentials.user);
       await updateProfile(credentials.user, { displayName: name });
-      navigate("/");
     } catch (err) {
       if (err instanceof FirebaseError) {
         setError(err.message);
       }
     } finally {
+      //추가한 부분------------------------------------>
+      const user = auth.currentUser;
+
+      const document = await setDoc(doc(db, "users", `${user?.uid}`), {
+        createdAt: Date.now(),
+        username: user.displayName || "익명",
+        userId: user.uid,
+        followedUser: [],
+        followingUser: [],
+        backgroundLevel: 0,
+        email: email,
+      });
       setIsLoading(false);
+
+      //----------------------------------------------
+      navigate("/");
     }
-    console.log(name, email, password);
   };
   return (
     <div

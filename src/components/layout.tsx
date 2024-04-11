@@ -12,7 +12,7 @@ const Wrapper = styled.div`
   width: 100%;
   height: 100%;
   max-width: 1250px;
-  grid-template-columns: 1fr 2.5fr 1.2fr 0.3fr;
+  grid-template-columns: 1fr 3fr 1.2fr;
 `;
 const Menu = styled.div`
   padding-top: 40px;
@@ -47,13 +47,13 @@ const MenuItem = styled.div`
 const SideBar = styled.div`
   padding-top: 40px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
 `;
 const InnerSideBar = styled.div`
   background-color: #ebebeb;
   border-radius: 15px;
-  width: 100%;
-  height: 92%;
+  width: 90%;
+  height: 80%;
 `;
 
 const Text = styled.span`
@@ -98,12 +98,6 @@ const Div = styled.div`
   cursor: pointer;
 `;
 
-const RightSideBar = styled.div`
-  width: 100%;
-  height: 92%;
-  padding: 10px;
-  position: relative;
-`;
 const NewPostButton = styled.div`
   height: 60px;
   width: 60px; //메뉴 크기랑 맞추기
@@ -113,18 +107,18 @@ const NewPostButton = styled.div`
     background-color: #b1b1b144;
   }
 
-  position: absolute;
   bottom: 0;
-  right: 10px;
+  right: 0px;
 
   background: none;
   border: none;
-  background-image: url("public/writeIcon.svg");
+
   background-size: cover;
   background-position: center;
   cursor: pointer;
   background-repeat: no-repeat;
   background-size: 50px;
+  position: absolute;
 `;
 
 /*overlay는 모달 창 바깥 부분을 처리하는 부분이고,
@@ -152,9 +146,6 @@ const customModalStyles: ReactModal.Styles = {
     overflow: "auto",
   },
 };
-// const ForPaddingDiv = styled.div`
-//   padding: 20px;
-// `;
 
 export default function Layout() {
   const [modalOpend, setModalOpend] = useState(false);
@@ -289,17 +280,23 @@ export default function Layout() {
               <Text>Saved</Text>
             </ForMidDiv>
           </StyeldLink>
-          <StyeldLink
-            to="test-page"
-            style={({ isActive }) =>
-              isActive ? { backgroundColor: "#f1f1f1" } : null
-            }
-          >
-            <MenuItem></MenuItem>
+          <Div onClick={handleModalOpen}>
+            <MenuItem>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6"
+              >
+                <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
+              </svg>
+            </MenuItem>
+            <NewPostButton></NewPostButton>
+
             <ForMidDiv>
-              <Text>Dev Test</Text>
+              <Text>Post</Text>
             </ForMidDiv>
-          </StyeldLink>
+          </Div>
           <Div onClick={onLogOut}>
             <MenuItem className="log-out">
               <svg
@@ -321,19 +318,14 @@ export default function Layout() {
               </svg>
             </MenuItem>
             <ForMidDiv>
-              <Text>Log Out</Text>
+              <Text>Logout</Text>
             </ForMidDiv>
           </Div>
         </Menu>
 
         <Outlet />
 
-        <SideBar>
-          <InnerSideBar></InnerSideBar>
-        </SideBar>
-        <RightSideBar>
-          <NewPostButton onClick={handleModalOpen}></NewPostButton>
-        </RightSideBar>
+        <SideBar></SideBar>
         <ReactModal
           style={customModalStyles}
           isOpen={modalOpend}

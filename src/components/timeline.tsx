@@ -34,10 +34,9 @@ export interface IPost {
 const Posts = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 35px;
   width: 100%;
-  border-left: 3px solid #000000c8;
-  border-right: 3px solid #000000c8;
+  z-index: 5;
 `;
 
 export default function Timeline() {
@@ -79,7 +78,6 @@ export default function Timeline() {
           };
         });
         setPost(posts);
-        console.log(posts);
       });
     };
     fetchPotsts();
