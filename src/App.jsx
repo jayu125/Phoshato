@@ -101,6 +101,7 @@ const router = createBrowserRouter([
     path: "/reset-password",
     element: <ResetPassword />,
   },
+  { path: "/*", element: <Home /> },
 ]);
 
 const Wrapper = styled.div`
