@@ -134,17 +134,18 @@ export default function CreateAccount() {
     } finally {
       //추가한 부분------------------------------------>
       const user = auth.currentUser;
-
-      const document = await setDoc(doc(db, "users", `${user?.uid}`), {
-        createdAt: Date.now(),
-        username: user.displayName,
-        userId: user.uid,
-        followedUser: [],
-        followingUser: [],
-        backgroundLevel: 0,
-        email: email,
-      });
-      setIsLoading(false);
+      if (user) {
+        const document = await setDoc(doc(db, "users", `${user?.uid}`), {
+          createdAt: Date.now(),
+          username: user.displayName,
+          userId: user.uid,
+          followedUser: [],
+          followingUser: [],
+          backgroundLevel: 0,
+          email: email,
+        });
+        setIsLoading(false);
+      }
 
       //----------------------------------------------
       navigate("/");
