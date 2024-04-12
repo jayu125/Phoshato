@@ -203,9 +203,9 @@ const LikeButton = styled.button`
 
   background: none;
   border: none;
-  background-image: url("public/likes.svg");
+  background-image: url("../public/likes.svg");
   &.likedClass {
-    background-image: url("public/liked.svg");
+    background-image: url("../public/liked.svg");
   }
 
   background-size: cover;
@@ -225,7 +225,7 @@ const CommentsButton = styled.button`
 
   background: none;
   border: none;
-  background-image: url("public/comments.svg");
+  background-image: url("../public/comments.svg");
   background-size: cover;
   background-position: center;
   background-size: 90%;
@@ -246,9 +246,9 @@ const SaveButton = styled.button`
 
   background: none;
   border: none;
-  background-image: url("public/save.svg");
+  background-image: url("../public/save.svg");
   &.savedClass {
-    background-image: url("public/saved.svg");
+    background-image: url("../public/saved.svg");
   }
 
   background-size: cover;
