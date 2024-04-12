@@ -8,7 +8,7 @@ const Button = styled.button`
   font-weight: 500;
   padding: 10px 20px;
   border-radius: 50px;
-  border: 0;
+  border: 2px solid black;
   display: flex;
   gap: 5px;
   align-items: center;
@@ -19,7 +19,8 @@ const Button = styled.button`
   cursor: pointer;
   user-select: none;
   &:hover {
-    opacity: 0.8;
+    color: white;
+    background-color: black;
   }
 `;
 

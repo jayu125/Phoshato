@@ -6,6 +6,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { Error, Form, Switcher } from "../components/auth-components";
 import GithubBtn from "../components/github-button";
 import styled from "styled-components";
+import { media } from "../styles/media";
 
 const Title = styled.p`
   font-size: 110px;
@@ -13,7 +14,7 @@ const Title = styled.p`
   line-height: 90%;
   font-weight: 700;
   user-select: none;
-  font-stretch: 100%;
+  padding-right: 40px;
   background-image: linear-gradient(
     160deg,
     #7aa9c9 0%,
@@ -23,6 +24,30 @@ const Title = styled.p`
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+
+  ${media.small`
+  font-size: 55px;
+  letter-spacing: -5px;
+  line-height: 90%;
+  font-weight: 700;
+  user-select: none;
+  font-stretch: 100%;
+  text-align: center;
+  background-image: linear-gradient(
+    160deg,
+    #7aa9c9 0%,
+    #316e6776 50%,
+    #7aa9c9 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 23%;
+  right: -110%;
+  width: 275px;
+  `}
 `;
 
 const WrapperLeft = styled.div`
@@ -32,12 +57,21 @@ const WrapperLeft = styled.div`
   align-items: center;
   justify-content: center;
   width: 45%;
-  padding: 100px 0px 100px 100px;
   user-select: none;
   position: absolute;
 
   left: 0;
+
+  ${media.small`
+    height: 100%;
+    width: 50%;
+    user-select: none;
+    
+    position: absolute;
+    left: 0;
+  `}
 `;
+
 const WrapperRight = styled.div`
   height: 100%;
   display: flex;
@@ -45,11 +79,27 @@ const WrapperRight = styled.div`
   align-items: center;
   justify-content: center;
   width: 50%;
-  padding: 200px 175px 100px 75px;
+  padding: 200px 0px 100px 75px;
   user-select: none;
   position: absolute;
 
   right: 0;
+
+  ${media.small`
+  height: 70%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 105%;
+  padding: 200px 175px 100px 75px;
+  user-select: none;
+  position: absolute;
+
+  right: -65%;
+  bottom: -20%;
+  transform: translate(-50%, -50%);
+  `}
 `;
 
 const Input = styled.input`
@@ -87,6 +137,22 @@ const Input = styled.input`
   }
 `;
 
+const Div = styled.div`
+  height: 100vh;
+  width: 100vh;
+  display: flex;
+  justify-content: center;
+  position: relative;
+
+  ${media.small`
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  `}
+`;
+
 export default function CreateAccount() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setemail] = useState("");
@@ -122,7 +188,7 @@ export default function CreateAccount() {
   };
 
   return (
-    <>
+    <Div>
       <WrapperLeft>
         <Title style={{ fontStretch: "ultra-condensed" }}>
           LOG INTO PHOSHATO
@@ -163,6 +229,6 @@ export default function CreateAccount() {
         </Switcher>
         <GithubBtn />
       </WrapperRight>
-    </>
+    </Div>
   );
 }
